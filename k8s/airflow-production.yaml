@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-deployment-production
+  namespace: production
+  labels:
+    name: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: airflow
+  template:
+    metadata:
+      labels:
+        component: airflow
+    spec:
+      hostNetwork: false
+      restartPolicy: Always
+      containers:
+      - name: airflow
+        image: interinteltechnologies/airflow:latest
+        resources:
+            limits:
+              memory: "1000Mi"
+              cpu: "300m"
+            requests:
+              memory: "1000Mi"
+              cpu: "300m"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: azure
+            mountPath: /mnt/azure
+      volumes:
+        - name: azure
+          azureFile: 
+            secretName: azure-secret
+            shareName: aks-test   #replace with name of fileshare created
+            readOnly: false 
+
+
+
